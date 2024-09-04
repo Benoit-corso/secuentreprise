@@ -1,5 +1,7 @@
 #! /usr/bin/env bash
 
+declare -A packages
+declare -A host_ip
 ##############################################################################
 #_____  _______      _     ____           ____
 #‾‾‾‾‾##‾‾‾‾‾‾####$'‾‾‾'$###,‾‾';#######:'‾‾,# Copyright Benoit CORSO - 2024
@@ -26,7 +28,6 @@ DISTRO=${DISTRO:=debian}
 WINDOWS_ARCH=${WINDOWS_ARCH:=amd64}
 MACOS_ARCH=${MACOS_ARCH:=arm64}
 
-declare -A packages
 packages=(
 	["zabbix"]		="${ZABBIX_VERSION:=7.0}"	#LTS
 	["prometheus"]		="${PROMETHEUS_VERSION:=2.54.1}"#2024-08-27
@@ -45,9 +46,13 @@ packages=(
 
 # Fin de la configuration
 ##############################################################################
+# TODO:
+#	- use dialog for prompt
+#
 unset VERSION
 unset version
 
+host_ip=($(ip a | grep inet | awk '{print $2}' | tr "\n" " "))
 gh_prometheus="https://github.com/prometheus/"
 gh_prometheus_community="https://github.com/prometheus-community/"
 
@@ -114,18 +119,21 @@ print_help() {
 	echo ""
 }
 
-for arg in "$@"; do
-	case $arg in
-		"--help")
-		"-h"
-		print_help;;
-	*) echo >&2 "Invalid option: $@"; exit 1;;
-	esac
-done
+#for arg in "$@"; do
+#	case $arg in
+#		"--help")
+#		"-h"
+#		print_help;;
+#	*) echo >&2 "Invalid option: $@"; exit 1;;
+#	esac
+#done
 
 
-i=((0))
-for package in "${packages[@]}"; do
-	echo "Installing ${package} v${version[$i]}"
-	((i++))
+#i=((0))
+#for package in "${packages[@]}"; do
+#	echo "Installing ${package} v${version[$i]}"
+#	((i++))
+#done
+
+select ip in ${host_ip[@]}; do
 done
