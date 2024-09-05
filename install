@@ -22,35 +22,43 @@ declare -A host_ip
 # 	qui n'expose pas les données collectés par les differents services.
 #
 # Configuration:
-ARCH=${ARCH:=arm64}
-OS=${OS:=linux}
-DISTRO=${DISTRO:=debian}
-WINDOWS_ARCH=${WINDOWS_ARCH:=amd64}
-MACOS_ARCH=${MACOS_ARCH:=arm64}
+ARCH=${ARCH:="arm64"}
+OS=${OS:="linux"}
+DISTRO=${DISTRO:="debian"}
+WINDOWS_ARCH=${WINDOWS_ARCH:="amd64"}
+MACOS_ARCH=${MACOS_ARCH:="arm64"}
+PKG_MANAGER=${PKG_MANAGER:="apt"}
 
 packages=(
-	["zabbix"]		="${ZABBIX_VERSION:=7.0}"	#LTS
-	["prometheus"]		="${PROMETHEUS_VERSION:=2.54.1}"#2024-08-27
-	["node_exporter"]	="${NODEEXP_VERSION:=1.8.2}"	#2024-06-19
-	["windows_exporter"]	="${WINDOWSEXP_VERSION:=0.28.1}"#2024-08-31
-	["grafana"]		="${GRAFANA_VERSION:=}"		#
-	["elasticsearch"]	="${ELASTIC_VERSION:=}"		#
-	["kibana"]		="${KIBANA_VERSION:=}"		#
-	["metricbeat"]		="${METRIC_VERSION:=}"		#
-	["logstash"]		="${LOGSTASH_VERSION:=}"	#
-	["thehive"]		="${THEHIVE_VERSION:=}"		#
-	["mariadb"]		="${MARIADB_VERSION:=}"		#
-	["nginx"]		="${NGINX_VERSION:=}"		#
-	["MISP"]		="${MISP_VERSION:=}"		#
+	["zabbix"]				="${ZABBIX_VERSION:="7.0"}"			#LTS
+	["prometheus"]			="${PROMETHEUS_VERSION:="2.54.1"}"	#2024-08-27
+	["node_exporter"]		="${NODEEXP_VERSION:="1.8.2"}"		#2024-06-19
+	["windows_exporter"]	="${WINDOWSEXP_VERSION:="0.28.1"}"	#2024-08-31
+	["grafana"]				="${GRAFANA_VERSION:=""}"				#
+	["elasticsearch"]		="${ELASTIC_VERSION:=""}"				#
+	["kibana"]				="${KIBANA_VERSION:=""}"				#
+	["metricbeat"]			="${METRIC_VERSION:=""}"				#
+	["logstash"]			="${LOGSTASH_VERSION:=""}"			#
+	["thehive"]				="${THEHIVE_VERSION:=""}"				#
+	["mariadb"]				="${MARIADB_VERSION:=""}"				#
+	["nginx"]				="${NGINX_VERSION:=""}"				#
+	["MISP"]				="${MISP_VERSION:=""}"				#
 )
 
 # Fin de la configuration
 ##############################################################################
 # TODO:
-#	- use dialog for prompt
 #
 unset VERSION
 unset version
+if ! [ -e "$(which dialog)" ]; then echo "should install dialog to use this script.\n\t wanna do it now ? [Yy/Nn] "; read -n1 dialog_install;
+	if [ "$install_dialog" = "Y" ] || [ "$install_dialog" = "y" ]; then
+		$PKG_MANAGER install -y dialog
+		if [ "$?" = "0" ]; then
+			echo "${PKG_MANAGER} encountered an error.";
+		fi
+	fi
+fi
 
 host_ip=($(ip a | grep inet | awk '{print $2}' | tr "\n" " "))
 gh_prometheus="https://github.com/prometheus/"
@@ -58,7 +66,7 @@ gh_prometheus_community="https://github.com/prometheus-community/"
 
 get_installer() {
 	local version=$1
-	local 
+	local package=$2
 	installers=(
 		"https://repo.zabbix.com/"
 		"${gh_prometheus}"
@@ -136,4 +144,5 @@ print_help() {
 #done
 
 select ip in ${host_ip[@]}; do
+	echo $ip
 done
