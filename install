@@ -45,6 +45,36 @@ packages=(
 	["MISP"]="${MISP_VERSION:=}"							#
 )
 
+prereq=(
+	["zabbix"]="${ZABBIX_VERSION:=7.0}"						#LTS
+	["prometheus"]="${PROMETHEUS_VERSION:=2.54.1}"			#2024-08-27
+	["node_exporter"]="${NODEEXP_VERSION:=1.8.2}"			#2024-06-19
+	["windows_exporter"]="${WINDOWSEXP_VERSION:=0.28.1}"	#2024-08-31
+	["grafana"]="${GRAFANA_VERSION:=}"						#
+	["elasticsearch"]="apt-transport-https"					#
+	["kibana"]="${KIBANA_VERSION:=}"						#
+	["metricbeat"]="${METRIC_VERSION:=}"					#
+	["logstash"]="${LOGSTASH_VERSION:=}"					#
+	["thehive"]="wget gnupg apt-transport-https git ca-certificates ca-certificates-java curl software-properties-common python3-pip lsb-release"						#
+	["mariadb"]="${MARIADB_VERSION:=}"						#
+	["nginx"]="${NGINX_VERSION:=}"							#
+	["MISP"]="${MISP_VERSION:=}"							#
+)
+
+# wget -qO - $repo_key | sudo gpg --dearmor -o /usr/share/keyrings/${package}-keyring.gpg
+repo_key=(
+	# corretto = JAVA openJDK by Amazon
+	["corretto"]="https://apt.corretto.aws/corretto.key"
+	["elasticsearch"]="https://artifacts.elastic.co/GPG-KEY-elasticsearch"
+	["cassandra"]="https://downloads.apache.org/cassandra/KEYS"
+	["thehive"]="https://raw.githubusercontent.com/StrangeBeeCorp/Security/main/PGP%20keys/packages.key"
+)
+# echo "$repo_address" | sudo tee /etc/apt/sources.list.d/elastic-${version}.list 
+repo_address=(
+	["elasticsearch"]="deb [signed-by=/usr/share/keyrings/elasticsearch-keyring.gpg] https://artifacts.elastic.co/packages/7.x/apt stable main"
+	["thehive"]="deb [arch=all signed-by=/usr/share/keyrings/thehive-keyring.gpg] https://deb.strangebee.com thehive-5.3 main"
+)
+
 # Fin de la configuration
 ##############################################################################
 # TODO:
