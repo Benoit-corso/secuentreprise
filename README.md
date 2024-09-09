@@ -1,9 +1,17 @@
-# Secu Entreprise
-```
-Mathias PUTZOLA
-Renova MANIRAFASHA
-Benoit CORSO
-```
+<div align="center">
+  <img src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExZTkzMXIycGx2bWtuOWkyOWZvd3Z2dGd2dnBvaG9ieDhiZDcxa3IzdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/QpVUMRUJGokfqXyfa1/giphy.gif" alt="File Sharing GIF" width="75%" height="500" style="">
+  <h1 style="">Secu Entreprise</h1>
+  <p>Projet de gestion integrant Monitoring, Supervision, et Administration des infrastructures. La collecte des données permet une d'agir de facon proactive.</p>
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![GitHub contributors](https://img.shields.io/github/contributors/benoit-corso/secuentreprise)
+</div>
+<blockquote>
+Benoit CORSO<dd>benoit.corso@laplatforme.io</dd>
+Mathias PUTZOLA<dd>mathias.putzola@laplateforme.io</dd>
+Renova MANIRAFASHA<dd>renova.manirafasha@laplateforme.io</dd>
+</blockquote>
+
 ## Prerequisite
 ```
 debian 12 (bookworm) arm64 - Raspberry Pi 4
@@ -14,10 +22,10 @@ debian 12 (bookworm) arm64 - Raspberry Pi 4
 - windows_exporter (version: 0.28.1)
 - process_exporter (version: 0.8.3)
 - grafana (version: 11.2.0)
-- elasticsearch (version: 8.15.0)
-- logstash (version: 8.15.0)
-- kibana (version: 8.15.0)
-- metricbeat (version: 8.15.0)
+- elasticsearch (version: 7.17.23)
+- logstash (version: 7.17.23)
+- kibana (version: 7.17.23)
+- metricbeat (version: 7.17.23)
 - thehive (version: ???)
 - MISP (version: ???)
 - nginx (latest)
