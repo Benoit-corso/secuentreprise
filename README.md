@@ -73,39 +73,95 @@ Le fonctionnement et l'installation de grafana est assez simple tout se fait par
 Comme nous avons fait le choix d'integrer des données qui sont utile dans la gestion de notre infrastructures il faut a present les integrés et les présenter.
 
 ### ELK (Elastic LogStash Kibana)
+ElasticSearch
+La première étape consiste à installer ElasticSearch, qui servira d'intermédiaire entre logstach et kibana. Sur notre machine Debian 12, ElasticSearch doit être configuré pour fonctionner sur le port 9200.
+Installation et configuration :
+        - Ajout de la clé publique et repository d'Elastic
+	curl -fsSL https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+	sudo apt-get install apt-transport-https
+	echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-7.x.list
+	- Installation du paquet : 
+	sudo apt update
+	sudo apt install elasticsearch
+	- Configuration :
+		- Modifier le fichier de configuration /etc/elasticsearch/elasticsearch.yml pour définir le cluster.name, le node.name et d'autres paramètres essentiels.
+		- S'assurer que le service est bien démarré et écoute sur le bon port en exécutant systemctl enable --now elasticsearch.
+
+Logstach
+Logstash est utilisé pour ingérer, transformer et envoyer les logs vers ElasticSearch. Sa configuration se fait par un fichier .conf qui décrit comment les logs sont collectés et traités.
+Installation et configuration :
+	- Installer Logstash avec le package manager.
+		sudo apt install logstash
+	- Créer un fichier de configuration, par exemple /etc/logstash/conf.d/logstash.conf qui inclut les sections suivantes :
+		sudo nano /etc/logstach/conf.d/logstach.conf
+		- Input : Données collectées de fichiers locaux ou d'autres sources comme Filebeat (Port 5044).
+		- Filter : Transformations des logs. (CSV / GROK)
+		- Output : Envoie des données à ElasticSearch (Port 9200).
+
+Filebeat
+Filebeat est un agent léger de collecte de logs développé par Elastic, qui envoie les fichiers de logs de manière continue vers Logstash ou directement vers ElasticSearch. Son rôle est de simplifier la collecte de logs sur des machines distantes, ce qui en fait un outil essentiel pour l'observation de systèmes distribués.
+Installation et configuration :
+	- Installation du paquet :
+		sudo apt update
+		sudo apt install filebeat
+	- Configuration du fichier filebeat.yml :
+		sudo nano /etc/filebeat/filebeat.yml
+		- Input Données collectées localement :
+	 		filebeat.inputs:
+  		  	- type: log
+   			enabled: true
+		- Accès au fichier :
+   			paths:
+     	  		- /path/to/*.log
+		- Ouput : 
+ 			output.elasticsearch:
+ 			  hosts: ["http://localhost:9200"]
+
+Metricbeat
+Metricbeat est un agent léger utilisé pour collecter des métriques système et de services sur vos serveurs et applications. Il fait partie de la suite Beats d'Elastic, qui comprend différents agents spécialisés pour la collecte de données. Metricbeat surveille l'état des ressources (CPU, mémoire, disque, réseau, etc.) ainsi que les services tels que Docker, Kubernetes, MySQL, NGINX, etc. Ensuite, il envoie ces métriques vers des outils comme ElasticSearch ou Logstash pour un traitement et une visualisation dans Kibana.
+Installation et configuration : 
+	- Installation du paquet : 
+		sudo apt-get install metricbeat
+	- Configuration du fichier metricbeat.yml
+		sudo nano /etc/metricbeat/metricbeat.yml
+		- Utilisation de modules : 
+ 			metricbeat.config.modules:
+ 			  path: ${path.config}/modules.d/*.yml
+ 			metricbeat.modules:
+  			 - module: system
+   			   metricsets:
+      				- cpu
+ 			        - memory
+      				- network
+      				- filesystem
+      				- process
+      				- diskio
+   			   enabled: true
+		- Output :
+ 			output.elasticsearch:
+ 			   hosts: ["http://localhost:9200"]
+ 			setup.kibana:
+  			   host: "localhost:5601"
 
 
-### ELK-Watcher
+Kibana
+Kibana sert d'interface pour visualiser et explorer les données stockées dans ElasticSearch.
+Installation et configuration :
+	- Installer Kibana avec la package manager :
+		sudo apt install kibana
+	- Configuration du fichier Kibana.yml
+		sudo nano /etc/kibana/kibana.yml
+		- Écoute sur l'interface réseau : 
+			server.host: "0.0.0.0" 
+		- Écoute du port ElasticSearch :
+			elasticsearch.hosts: ["http://localhost:9200"]
 
 
-### The Hive & MISP
+Tout les services ont été démarré avec la commande : 
+	sudo systemctl enable [name.service]
+	sudo systemctl start [name.service]
+Et pourront être vérifié avec la commande : 
+	sudo systemctl status [name.service]
+Avec un accès aux logs avec la commande :
+	sudo tail -f /var/log/[name.service]
 
-
-## Deroulement du projet
-Etape 1: Ok.
-Etape 2: Ok.
-Etape 3: Ok.
-Etape 4: Ok.
-Etape 5: Ok.
-Etape 6: Ok. (need extract forward to ELK ?? i think)
-Etape 7: Ko.
-Etape 8: Ko.
-Etape 9: Ko.
-
-#### Windows Exporter
-install service with:
-```
-msiexec /i windows_exporter-0.28.1-amd64.msi ENABLED_COLLECTORS="os,system,cpu,net,ad,iis,logon,memory,process,tcp,textfile,thermalzone,service,physical_disk" LISTEN_PORT=9182
-# Open firewall
-New-NetFirewallRule -DisplayName "Allow Inbound Windows Exporter" -Direction Inbound -Program "C:\Program Files\windows_exporter\windows_exporter.exe" -RemoteAddress LocalSubnet -Action Allow
-```
-
-#### TODO:
-- Check every binding address for services, should be all binded to 127.0.0.1
-- Check every VHosts.
-- Finished layout and connected services for displaying datas. (done on grafana, waiting for kibana)
-- Maybe connect zabbix alerts:
-                - w/ windows notifications.
-                - w/ SMS.
-                - into Grafana.
-- Faire ELK-watcher, pour, je pense, recuperer les datas des packets capturés avec wireshark.
